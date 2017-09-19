@@ -1,0 +1,10 @@
+<% track ||= nil %>
+<% big ||= false %>
+
+<div class="track<%= ' track--big' if big %>" data-track="<%= track.to_json.html_safe.gsub /"/, '\\"' if track.present? %>">
+	<div class="track__cover"></div>
+  <div class="track__infos">
+    <span class="track__title">Track title</span>
+    <span class="track__meta">Track author • date</span>
+  </div>
+</div>

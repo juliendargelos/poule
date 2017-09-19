@@ -23,42 +23,9 @@
     +max(medium)
       padding: 20px
 
-  &__cover
-    // TODO: remove
-    background-image: image-url('tmpcover.png')
-
-    background-repeat: no-repeat
-    background-position: center center
-    background-size: cover
-    width: 200px
-    height: 200px
-    border-radius: 30px
-    box-shadow: $tracklist-box-shadow
-    float: left
-    +max(medium)
-      width: 80px
-      height: 80px
-      border-radius: 15px
-
-  &__infos
-    padding-left: 230px
-    +max(medium)
-      padding-left: 90px
-      margin-bottom: -10px
-
-  &__title
-    display: block
-    font-size: 36px
-    color: $white
-    +max(medium)
-      font-size: 14px
-
-  &__meta
-    color: transparentize($white, .5)
-    +max(medium)
-    font-size: 9px
-
   &__search
+    padding-top: 20px
+    padding-bottom: 20px
     padding-left: 230px
     position: relative
     +max(medium)
@@ -116,3 +83,15 @@
       border-bottom-left-radius: 0
       border-bottom-right-radius: 0
       box-shadow: none
+
+  &__tracks
+    clear: both
+    display: flex
+    justify-content: space-between
+    flex-wrap: wrap
+
+  &__track
+    width: calc(50% - 15px)
+    margin-top: 30px
+    flex-grow: 0
+    flex-shrink: 0
