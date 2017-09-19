@@ -1,0 +1,7 @@
+=max($breakpoint)
+  @media screen and (max-width: #{breakpoint($breakpoint)})
+    @content
+
+=min($breakpoint)
+  @media screen and (min-width: #{breakpoint($breakpoint) + 1})
+    @content

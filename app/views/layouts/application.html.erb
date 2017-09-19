@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Poule</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag :application %>
+  </head>
+
+  <body>
+
+    <h1 class="logo">
+      <span class="logo__letter">P</span>
+      <span class="logo__letter">o</span>
+      <span class="logo__letter">u</span>
+      <span class="logo__letter">l</span>
+      <span class="logo__letter">e</span>
+    </h1>
+
+    <%= yield %>
+
+    <%= javascript_include_tag :application %>
+  </body>
+</html>

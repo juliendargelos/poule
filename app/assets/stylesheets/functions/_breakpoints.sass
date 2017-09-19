@@ -1,0 +1,5 @@
+@function breakpoint($breakpoint)
+  @if type-of($breakpoint) == string
+    @return map-get($breakpoints, $breakpoint)
+  @else
+    @return $breakpoint
