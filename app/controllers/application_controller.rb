@@ -1,6 +1,12 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :set_tracklist
+  #TODO: remove except
+  before_action :set_tracklist, except: :tmp
+
+  #TODO: remove tmp action
+  def tmp
+    render html: '', layout: 'application'
+  end
 
   protected
 

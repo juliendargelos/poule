@@ -1,4 +1,4 @@
-Tracklist.Search = function(element) {
+Poule.Tracklist.Search = function(element) {
   this.element = element;
   this.placeholder = this.element.querySelector('.tracklist__search-placeholder');
   this.input = this.element.querySelector('.tracklist__search-input');
@@ -6,8 +6,8 @@ Tracklist.Search = function(element) {
   this.init();
 };
 
-Tracklist.Search.prototype = {
-  constructor: Tracklist.Search,
+Poule.Tracklist.Search.prototype = {
+  constructor: Poule.Tracklist.Search,
 
   get value() {
     return this.input.value.trim();
