@@ -11,12 +11,12 @@ class ApplicationController < ActionController::Base
   protected
 
   def current_tracklist
-    @current_tracklist ||= Tracklist.find_by uuid: session[:tracklist]
+    @current_tracklist ||= Tracklist.find_by uuid: session[:tracklist_uuid]
   end
 
   def current_tracklist= v
     current_tracklist.destroy if current_tracklist?
-    session[:tracklist] = v.uuid
+    session[:tracklist_uuid] = v.uuid
     @current_tracklist = v
   end
 
@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_tracklist
-    @tracklist = Tracklist.find_by slug: params[:slug]
+    @tracklist = Tracklist.find_by slug: params[:tracklist_slug].present? ? params[:tracklist_slug] : params[:slug]
   end
 
   def tracklist?

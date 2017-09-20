@@ -6,7 +6,7 @@ class TracksController < ApplicationController
   end
 
   def create
-    @track = Track.new tracks_params
+    @track = Track.new track_params.merge(tracklist: @tracklist)
     @track.save ? render_tracks : render_error
   end
 
