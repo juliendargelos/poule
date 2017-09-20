@@ -31,17 +31,28 @@ Poule.Api.prototype = {
     }
   },
 
+  getUrl:
+
   actions: {
     get: {
       url: function(id) {
         return null;
       },
-      search: function(response) {
+
+      parse: function(response) {
         return null;
       }
     },
 
-    search
+    search: {
+      url: function(input) {
+        return null;
+      },
+
+      parse: function(response) {
+
+      }
+    }
   }
 
   action: function
