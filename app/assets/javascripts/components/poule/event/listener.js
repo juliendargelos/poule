@@ -22,7 +22,7 @@ Poule.Event.Listener.prototype = {
     if(this.available(event)) {
       var handlers = this.get(event);
       var index = handlers.indexOf(callback);
-      if(index != -1) this.handlers[event] = handlers.slice(0, index).concat(handlers.slice(index + 1));
+      if(index !== -1) this.handlers[event] = handlers.slice(0, index).concat(handlers.slice(index + 1));
     }
   },
 

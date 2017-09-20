@@ -16,7 +16,7 @@ Poule.Request = function(url, method) {
   this.on('change', function() {
     if(this.finished) {
       this.dispatch('complete', this.response);
-      if(this.status == 200) this.dispatch('success', this.response);
+      if(this.status === 200) this.dispatch('success', this.response);
       else this.dispatch('error', this.response);
       this.data = null;
     }
@@ -37,7 +37,7 @@ Poule.Request.prototype = {
   },
 
   get finished() {
-    return this.state == 4;
+    return this.state === 4;
   },
 
   get status() {
@@ -58,28 +58,31 @@ Poule.Request.prototype = {
 
   send: function(data) {
     if(data !== undefined) this.data = data;
-    var url = this.url+(this.method.toLowerCase() == 'get' ? '?'+this.params : '');
+    var url = this.url+(this.method.toLowerCase() === 'get' ? '?'+this.params : '');
     this.xhr.open(this.method.toUpperCase(), url);
-    this.xhr.send(this.method.toLowerCase() == 'post' ? this.form : undefined);
+    this.xhr.send(this.method.toLowerCase() === 'post' ? this.form : undefined);
 
     return this;
   }
 };
 
 Poule.Request.params = function(data, tree) {
-  if(typeof tree != 'string') tree = '';
+  if(typeof tree !== 'string') tree = '';
   var params = '';
 
-  for(var p in data) {
-    if(['string', 'number', 'boolean'].includes(typeof data[p])) {
-      params += tree+(tree == ''? p : '['+p+']')+'='+encodeURIComponent(data[p])+'&';
-    }
-    else if(typeof data[p] == 'object') {
-      params += this.params(data[p], tree+(tree == '' ? p : '['+p+']'))+'&';
-    }
-  }
+  for(var param in data) params += this.param(data, param, tree);
 
   return params.replace(/&$/, '');
+};
+
+Poule.Request.param = function(data, param, tree) {
+  if(['string', 'number', 'boolean'].includes(typeof data[param])) {
+    return tree+(tree === '' ? param : '['+param+']')+'='+encodeURIComponent(data[param])+'&';
+  }
+  else if(typeof data[param] == 'object') {
+    return this.params(data[param], tree+(tree === '' ? param : '['+param+']'))+'&';
+  }
+  else return '';
 };
 
 Poule.Request.form = function(data, form, namespace) {
@@ -87,18 +90,17 @@ Poule.Request.form = function(data, form, namespace) {
   if(data instanceof HTMLElement) form = new FormData(data);
   else {
     if(!(form instanceof FormData)) form = new FormData();
-
-    var key;
-
-    for(var property in data) {
-      if(data.hasOwnProperty(property)) {
-        key = namespace ? namespace+'['+property+']' : property;
-
-        if(typeof data[property] === 'object' && !(data[property] instanceof File) && !(data[property] instanceof FileList) && data[property] !== null) Mu.Request.form(data[property], form, key);
-        else form.append(key, data[property]);
-      }
-    }
+    for(var field in data) this.field(data, field, namespace);
   }
 
   return form;
+};
+
+Poule.Request.field = function(data, field, namespace) {
+  if(data.hasOwnProperty(field)) {
+    var key = namespace ? namespace+'['+field+']' : field;
+
+    if(typeof data[field] === 'object' && !(data[field] instanceof File) && !(data[field] instanceof FileList) && data[field] !== null) this.form(data[field], form, key);
+    else form.append(key, data[field]);
+  }
 };
