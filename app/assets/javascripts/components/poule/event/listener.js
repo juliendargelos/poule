@@ -14,18 +14,6 @@ Poule.Event.Listener.prototype = {
     return this.handlers[event];
   },
 
-  addEventListener: function(event, callback) {
-    this.get(event).push(callback);
-  },
-
-  removeEventListener: function(event, callback) {
-    if(this.available(event)) {
-      var handlers = this.get(event);
-      var index = handlers.indexOf(callback);
-      if(index !== -1) this.handlers[event] = handlers.slice(0, index).concat(handlers.slice(index + 1));
-    }
-  },
-
   each: function(events, callback) {
     events = (events+'').split(' ');
     var event;
@@ -38,13 +26,18 @@ Poule.Event.Listener.prototype = {
 
   on: function(events, callback) {
     this.each(events, function(event) {
-      this.addEventListener(event, callback);
+      this.get(event).push(callback);
     });
   },
 
   off: function(events, callback) {
+    var handlers, index;
     this.each(events, function(event) {
-      this.removeEventListener(evebnt, callback);
+      if(this.available(event)) {
+        handlers = this.get(event);
+        index = handlers.indexOf(callback);
+        if(index !== -1) this.handlers[event] = handlers.slice(0, index).concat(handlers.slice(index + 1));
+      }
     });
   },
 
@@ -71,8 +64,6 @@ Poule.Event.Listener.prototype = {
   },
 
   defer: function(object) {
-    this.assign('addEventListener', object);
-    this.assign('removeEventListener', object);
     this.assign('on', object);
     this.assign('off', object);
     this.assign('once', object);
