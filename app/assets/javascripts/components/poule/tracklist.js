@@ -4,7 +4,7 @@ Poule.Tracklist = function(element) {
 };
 
 Poule.Tracklist.prototype = {
-  constructor: Poule.Tracklist,
+  constructor: Poule.Tracklist
 };
 
 Poule.Tracklist.init = function() {

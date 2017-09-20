@@ -13,20 +13,18 @@ module Slugable
 
 		protected
 
-		def has_slug attribute = nil, method = nil, length: nil, chars: nil, &block
+		def has_slug attribute = nil, method = nil, length: nil, chars: nil
 			attribute = attribute.present? ? attribute.try(:to_s).try(:to_sym) : SLUG_ATTRIBUTE
 
 			raise "Column \"#{attribute}\" doesn't exist in #{self}" unless attribute_names.include? attribute.to_s
 
-			unless method.is_a?(Proc) || block_given?
+			unless method.is_a? Proc
 				length ||= SLUG_LENGTH
 				chars ||= SLUG_CHARS
 				chars = chars.to_s if chars.is_a? Symbol
 				chars = chars.split if chars.is_a? String
 
 				method = -> { (0..length - 1).map{ chars.sample }.join }
-			else
-				method = block unless method.is_a? Proc
 			end
 
 			validates attribute, presence: true, uniqueness: true

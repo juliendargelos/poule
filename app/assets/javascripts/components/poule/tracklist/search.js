@@ -44,7 +44,7 @@ Poule.Tracklist.Search.prototype = {
     });
 
     this.input.addEventListener('blur', function() {
-      if(self.value == '') self.focus = false;
+      if(self.value === '') self.focus = false;
     });
   }
 };

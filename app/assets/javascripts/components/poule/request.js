@@ -70,7 +70,9 @@ Poule.Request.params = function(data, tree) {
   if(typeof tree !== 'string') tree = '';
   var params = '';
 
-  for(var param in data) params += this.param(data, param, tree);
+  for(var param in data) {
+    if(data.hasOwnProperty(param)) params += this.param(data, param, tree);
+  }
 
   return params.replace(/&$/, '');
 };
@@ -79,7 +81,7 @@ Poule.Request.param = function(data, param, tree) {
   if(['string', 'number', 'boolean'].includes(typeof data[param])) {
     return tree+(tree === '' ? param : '['+param+']')+'='+encodeURIComponent(data[param])+'&';
   }
-  else if(typeof data[param] == 'object') {
+  else if(typeof data[param] === 'object') {
     return this.params(data[param], tree+(tree === '' ? param : '['+param+']'))+'&';
   }
   else return '';
@@ -90,17 +92,17 @@ Poule.Request.form = function(data, form, namespace) {
   if(data instanceof HTMLElement) form = new FormData(data);
   else {
     if(!(form instanceof FormData)) form = new FormData();
-    for(var field in data) this.field(data, field, namespace);
+    for(var field in data) {
+      if(data.hasOwnProperty(field)) this.field(data, field, namespace);
+    }
   }
 
   return form;
 };
 
 Poule.Request.field = function(data, field, namespace) {
-  if(data.hasOwnProperty(field)) {
-    var key = namespace ? namespace+'['+field+']' : field;
+  var key = namespace ? namespace+'['+field+']' : field;
 
-    if(typeof data[field] === 'object' && !(data[field] instanceof File) && !(data[field] instanceof FileList) && data[field] !== null) this.form(data[field], form, key);
-    else form.append(key, data[field]);
-  }
+  if(typeof data[field] === 'object' && !(data[field] instanceof File) && !(data[field] instanceof FileList) && data[field] !== null) this.form(data[field], form, key);
+  else form.append(key, data[field]);
 };
