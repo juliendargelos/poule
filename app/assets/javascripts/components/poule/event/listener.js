@@ -1,5 +1,6 @@
 Poule.Event.Listener = function() {
   this.handlers = {};
+  this.dispatchedEvents = {};
 };
 
 Poule.Event.Listener.prototype = {
@@ -48,6 +49,13 @@ Poule.Event.Listener.prototype = {
     });
   },
 
+  require: function(events, callback) {
+    var dispatched = this.dispatched(events);
+
+    if(dispatched) callback.call(this, dispatched);
+    else this.once(events, callback);
+  },
+
   dispatch: function(events, data) {
     var handler;
 
@@ -55,6 +63,7 @@ Poule.Event.Listener.prototype = {
       handlers = this.get(event);
 
       event = data instanceof Poule.Event ? data : new Poule.Event(event, data);
+      this.dispatchedEvents[event.type] = event;
 
       for(var i = 0; i < handlers.length; i++) {
         handlers[i].call(this, event);
@@ -63,10 +72,22 @@ Poule.Event.Listener.prototype = {
     });
   },
 
+  dispatched: function(events) {
+    var dispatched = false;
+
+    this.each(events, function(event) {
+      dispatched = this.dispatchedEvents[event];
+      return !!dispatched;
+    });
+
+    return dispatched;
+  },
+
   defer: function(object) {
     this.assign('on', object);
     this.assign('off', object);
     this.assign('once', object);
+    this.assign('require', object);
     this.assign('dispatch', object);
 
     return this;
