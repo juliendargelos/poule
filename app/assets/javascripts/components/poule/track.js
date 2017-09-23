@@ -1,9 +1,9 @@
-Poule.Track = function(source, url, cover, title, meta) {
-  this.element = null;
+Poule.Track = function(api, identifier, cover, title, meta) {
+  this._element = null;
   this.elements = {};
 
-  this.source = source;
-  this.url = url;
+  this.api = api;
+  this.identifier = identifier;
   this.cover = cover;
   this.title = title;
   this.meta = meta;
@@ -11,7 +11,32 @@ Poule.Track = function(source, url, cover, title, meta) {
 
 Poule.Track.prototype = {
   get created() {
-    return !!this.element;
+    return !!this._element;
+  },
+
+  get element() {
+    if(!this.created) {
+      this.create();
+      this.render();
+    }
+
+    return this._element;
+  },
+
+  set element(v) {
+    this._element = v;
+  },
+
+  get data() {
+    return {
+      track: {
+        api: this.api.name,
+        identifier: this.identifier,
+        cover: this.cover,
+        title: this.title,
+        meta: this.meta
+      }
+    }
   },
 
   create: function() {
@@ -31,7 +56,7 @@ Poule.Track.prototype = {
     this.elements.meta.className = 'track__meta';
 
     this.elements.infos.appendChild(this.elements.title);
-    this.elements.infos.appendChild(this.elements.name);
+    this.elements.infos.appendChild(this.elements.meta);
     this.element.appendChild(this.elements.cover);
     this.element.appendChild(this.elements.infos);
   },

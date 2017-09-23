@@ -2,7 +2,6 @@
   display: flex
 
   &__cover, &__infos
-    flex-shrink: 0
     flex-grow: 0
 
   &__cover
@@ -15,6 +14,7 @@
     width: 60px
     height: 60px
     border-radius: 10px
+    flex-shrink: 0
     +max(medium)
       width: 40px
       height: 40px
@@ -22,6 +22,7 @@
 
   &__infos
     padding-left: 15px
+    flex-shrink: 1
 
   &__title
     padding-top: 5px
@@ -60,6 +61,14 @@
 
   &--big &__meta
     color: transparentize($white, .5)
+
+  &--small &__cover
+    width: 40px
+    height: 40px
+    border-radius: 6px
+
+  &--small &__title
+    font-size: 14px
 
   +min(medium)
     &--big &__title

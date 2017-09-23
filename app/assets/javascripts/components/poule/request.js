@@ -15,9 +15,9 @@ Poule.Request = function(url, method) {
 
   this.on('change', function() {
     if(this.finished) {
-      this.dispatch('complete', this.response);
-      if(this.status === 200) this.dispatch('success', this.response);
-      else this.dispatch('error', this.response);
+      this.dispatch('complete', {response: this.response});
+      if(this.status === 200) this.dispatch('success', {response: this.response});
+      else this.dispatch('error', {response: this.response});
       this.data = null;
     }
   });
@@ -58,6 +58,7 @@ Poule.Request.prototype = {
 
   send: function(data) {
     if(data !== undefined) this.data = data;
+
     var url = this.url+(this.method.toLowerCase() === 'get' ? '?'+this.params : '');
     this.xhr.open(this.method.toUpperCase(), url);
     this.xhr.send(this.method.toLowerCase() === 'post' ? this.form : undefined);
@@ -65,6 +66,15 @@ Poule.Request.prototype = {
     return this;
   }
 };
+
+Object.defineProperties(Poule.Request, {
+  authenticityToken: {
+    get: function() {
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      return meta ? meta.getAttribute('content') : null;
+    }
+  },
+});
 
 Poule.Request.params = function(data, tree) {
   if(typeof tree !== 'string') tree = '';
@@ -89,18 +99,19 @@ Poule.Request.param = function(data, param, tree) {
 
 Poule.Request.form = function(data, form, namespace) {
   if(data instanceof FormData) return data;
-  if(data instanceof HTMLElement) form = new FormData(data);
+  if(namespace === undefined) data.authenticity_token = this.authenticityToken;
+  if(data instanceof HTMLFormElement) form = new FormData(data);
   else {
     if(!(form instanceof FormData)) form = new FormData();
     for(var field in data) {
-      if(data.hasOwnProperty(field)) this.field(data, field, namespace);
+      if(data.hasOwnProperty(field)) this.field(data, field, namespace, form);
     }
   }
 
   return form;
 };
 
-Poule.Request.field = function(data, field, namespace) {
+Poule.Request.field = function(data, field, namespace, form) {
   var key = namespace ? namespace+'['+field+']' : field;
 
   if(typeof data[field] === 'object' && !(data[field] instanceof File) && !(data[field] instanceof FileList) && data[field] !== null) this.form(data[field], form, key);

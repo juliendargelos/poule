@@ -42,11 +42,33 @@ Poule.Event.Listener.prototype = {
     });
   },
 
-  once: function(events, callback) {
-    this.on(events, function(event) {
-      callback.call(this, event);
-      this.off(events, callback);
+  count: function(amount, events, callback) {
+    if(typeof amount !== 'number') amount = 1;
+    if(amount === 0) callback.call(this);
+    else {
+      var count = 0;
+
+      countCallback = function(event) {
+        count++;
+
+        if(count >= amount) {
+          callback.call(this, event);
+          this.off(events, countCallback);
+        }
+      };
+
+      this.on(events, countCallback);
+    }
+  },
+
+  associate: function(origin, destination, amount) {
+    this.count(amount, origin, function(event) {
+      this.dispatch(destination, event);
     });
+  },
+
+  once: function(events, callback) {
+    this.count(1, events, callback);
   },
 
   require: function(events, callback) {
@@ -61,9 +83,12 @@ Poule.Event.Listener.prototype = {
 
     this.each(events, function(event) {
       handlers = this.get(event);
+      type = event;
 
       event = data instanceof Poule.Event ? data : new Poule.Event(event, data);
-      this.dispatchedEvents[event.type] = event;
+      if(typeof type === 'string') event.type = type;
+
+      this.dispatchedEvents[event.type] = event || true;
 
       for(var i = 0; i < handlers.length; i++) {
         handlers[i].call(this, event);
@@ -76,8 +101,8 @@ Poule.Event.Listener.prototype = {
     var dispatched = false;
 
     this.each(events, function(event) {
-      dispatched = this.dispatchedEvents[event];
-      return !!dispatched;
+      dispatched = !!this.dispatchedEvents[event];
+      return dispatched;
     });
 
     return dispatched;
@@ -87,17 +112,21 @@ Poule.Event.Listener.prototype = {
     this.assign('on', object);
     this.assign('off', object);
     this.assign('once', object);
+    this.assign('count', object);
     this.assign('require', object);
     this.assign('dispatch', object);
+    this.assign('associate', object);
+    this.assign('dispatched', object, false);
 
     return this;
   },
 
-  assign: function(method, object) {
+  assign: function(method, object, selfReturn) {
     var self = this;
+    if(selfReturn === undefined) selfReturn = true;
 
     object[method] = function() {
-      self[method].apply(self, Array.prototype.map.call(arguments, function(arg) {
+      var result = self[method].apply(self, Array.prototype.map.call(arguments, function(arg) {
         if(typeof arg === 'function') {
           return function() {
             return arg.apply(object, Array.prototype.slice.call(arguments));
@@ -106,7 +135,7 @@ Poule.Event.Listener.prototype = {
         else return arg;
       }));
 
-      return object;
+      return selfReturn ? object : result;
     };
   }
 };

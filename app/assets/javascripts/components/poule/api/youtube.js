@@ -1,38 +1,55 @@
 Poule.Api.Youtube = function() {
-  Poule.Api.call(this);
-
-  var self = this;
-
-  this.script = document.createElement('script');
-  this.script.async = true;
-  this.script.defer = true;
-  this.script.src = this.src;
-
-  this.script.addEventListener('load', function() {
-    self.load();
-  });
-
-  document.body.appendChild(this.script);
+  Poule.Api.apply(this, Array.prototype.slice.call(arguments));
 };
 
-Poule.Api.Youtube.prototype = Object.create(Poule.Api, Object.getOwnPropertyDescriptors({
+Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPropertyDescriptors({
   constructor: Poule.Api.Youtube,
-  src: 'https://apis.google.com/js/api.js',
-  key: 'AIzaSyACWZUx0jw3tqKl5NVuXqxuB7siYiziPDA',
+  name: 'Youtube',
+  scripts: [
+    'https://apis.google.com/js/api.js',
+    {
+      src: 'https://www.youtube.com/player_api',
+      load: function() {
+        var self = this;
+        window.onYouTubeIframeAPIReady = function() { self.dispatch('scriptLoad'); };
+      }
+    }
+  ],
+  key: 'AIzaSyCHv6fX1q3b0y74K-ljqzXHtbjx2j8rjIs',
 
-  load: function() {
+  init: function() {
     var self = this;
+
+    this.container = document.createElement('div');
+    this.container.className = 'api-player';
+    this.container.id = 'youtube-player';
+    document.body.appendChild(this.container);
+
+    this.player = new YT.Player(this.container.id);
 
     gapi.load('client', function() {
       gapi.client.load('youtube', 'v3', function() {
         gapi.client.setApiKey(self.key);
-        self.dispatch('load');
+        self.dispatch('ready');
       });
     });
   },
 
+  play: function(track) {
+    this.require('ready', function() {
+      if(track instanceof Poule.Track) this.player.loadVideoById(track.id);
+      this.player.playVideo();
+    });
+  },
+
+  pause: function() {
+    this.require('ready', function() {
+      this.player.pauseVideo();
+    });
+  },
+
   get: function(id, callback) {
-    this.require('load', function() {
+    this.require('ready', function() {
       gapi.client.youtube.videos.list({
         id: id,
         part: 'snippet,status',
@@ -40,8 +57,7 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api, Object.getOwnPropertyDesc
         maxResults: 1
       }).execute(function(response) {
         if(response.result && response.result.items && response.result.items.length > 0) {
-          console.log(response.result.items[0]);
-          // callback(new Poule.Track(source, url, cover, title, meta));
+          callback(new Poule.Track(source, url, cover, title, meta));
         }
         else callback(null);
       });
@@ -51,7 +67,7 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api, Object.getOwnPropertyDesc
   search: function(input, callback, strict) {
     var self = this;
 
-    this.require('load', function() {
+    this.require('ready', function() {
       gapi.client.youtube.search.list({
         q: input,
         part: 'snippet',
@@ -61,8 +77,15 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api, Object.getOwnPropertyDesc
         // videoCategoryId: strict ? 10 : undefined,
       }).execute(function(response) {
         if(response.result && response.result.items) {
-          console.log(response.result.items);
-          // callback(new self.Video(response.result.items));
+          callback(response.result.items.map(function(item) {
+            return new Poule.Track(
+              self,
+              item.id.videoId,
+              item.snippet.thumbnails.high.url,
+              item.snippet.title,
+              item.snippet.channelTitle
+            );
+          }));
         }
       });
     });

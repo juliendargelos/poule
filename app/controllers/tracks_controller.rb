@@ -13,7 +13,7 @@ class TracksController < ApplicationController
   private
 
   def track_params
-    params.require(:track).permit(:source, :url)
+    params.require(:track).permit(:api, :identifier, :cover, :title, :meta)
   end
 
   def render_error
