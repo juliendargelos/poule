@@ -5,14 +5,29 @@
     flex-grow: 0
 
   &__cover
-    // TODO: remove
-    background-image: image-url('tmpcover.png')
+    &::before
+      content: ''
+      background: $thin-grey image-url('spinner.svg') no-repeat center center / 50% auto
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      z-index: 2
+      opacity: 0
+      position: absolute
+      display: block
+      transition: .4s
+    &--loading::before
+      opacity: 1
 
+    background-color: $thin-grey
     background-repeat: no-repeat
     background-position: center center
     background-size: cover
     width: 60px
     height: 60px
+    position: relative
+    overflow: hidden
     border-radius: 10px
     flex-shrink: 0
     +max(medium)

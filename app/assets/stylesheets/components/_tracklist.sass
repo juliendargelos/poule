@@ -99,6 +99,7 @@
     background: $white
     border-radius: 15px
     box-shadow: $tracklist-box-shadow
+    z-index: 4
     position: absolute
     +max(medium)
       top: 30px
@@ -117,8 +118,11 @@
 
   &__search-result
     padding: 15px
+    cursor: pointer
     &:not(:last-of-type)
-      border-bottom: 1px solid $light-grey
+      border-bottom: 1px solid $thin-grey
+    &--selected, &:active
+      background-color: $thin-grey
 
   &__content
     background: $white

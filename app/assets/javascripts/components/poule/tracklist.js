@@ -1,4 +1,6 @@
 Poule.Tracklist = function(element) {
+  var self = this;
+
   this.element = element;
   this.search = new this.constructor.Search(this.element.querySelector('.tracklist__search'));
   this.tracks = [];
@@ -9,8 +11,13 @@ Poule.Tracklist = function(element) {
 
   this.requests = {
     index: new Poule.Request('/'+this.slug+'/tracks'),
-    add: new Poule.Request('/'+this.slug+'/tracks', 'post')
+    add: new Poule.Request('/'+this.slug+'/tracks', 'post'),
+    remove: new Poule.Request('/'+this.slug+'/tracks', 'delete')
   };
+
+  this.search.on('validate', function(event) {
+    self.add(event.track);
+  });
 
   this.connect();
 };
@@ -32,11 +39,22 @@ Poule.Tracklist.prototype = {
 
     this.requests.add.once('success', function(event) {
       var tracks = self.parse(event.response);
-      self.tracks.push(track);
-
-      if(self.different(tracks)) this.render();
-      else self.append(track);
+      if(self.different(tracks)) {
+        this.tracks = tracks;
+        this.render();
+      }
     }).send(track.data);
+  },
+
+  remove: function(track) {
+    var index = this.tracks.indexOf(track);
+    if(index !== -1) {
+      var self = this;
+
+      this.tracks = this.tracks.slice(0, index).concat(this.tracks.slice(index + 1));
+      track.element.parentNode.parentNode.removeChild(track.element.parentNode);
+      this.requests.remove.send(track.data);
+    }
   },
 
   different: function(tracks) {
@@ -60,6 +78,8 @@ Poule.Tracklist.prototype = {
     element.className = 'tracklist__track';
     element.appendChild(track.element);
 
+    track.element.normal = true;
+
     this.elements.tracks.appendChild(element);
   },
 
@@ -75,7 +95,8 @@ Poule.Tracklist.prototype = {
         track.identifier,
         track.cover,
         track.title,
-        track.meta
+        track.meta,
+        track.id
       );
     });
   },
@@ -102,7 +123,7 @@ Poule.Tracklist.prototype = {
 };
 
 Poule.Tracklist.checksum = function(tracks) {
-  return tracks.map(function(track) { return track.identifier; }).join('');
+  return tracks.map(function(track) { return track.id; }).join(',');
 };
 
 Poule.Tracklist.init = function() {

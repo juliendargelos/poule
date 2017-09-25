@@ -6,4 +6,5 @@ Rails.application.routes.draw do
 
   get '/:tracklist_slug/tracks' => 'tracks#index', as: :tracks
   post '/:tracklist_slug/tracks' => 'tracks#create'
+  delete '/:tracklist_slug/tracks' => 'tracks#destroy', as: :destroy_track
 end

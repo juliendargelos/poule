@@ -1,7 +1,10 @@
 Poule.Tracklist.Search = function(element) {
+  Poule.Event.Listener.defer(this);
+
   this.api = new Poule.Api();
   this.element = element;
-  this.tracks = [];
+  this._keep = false;
+  this.results = [];
   this.elements = {
     input: this.element.querySelector('.tracklist__search-input'),
     results: this.element.querySelector('.tracklist__search-results')
@@ -13,7 +16,39 @@ Poule.Tracklist.Search = function(element) {
 Poule.Tracklist.Search.prototype = {
   constructor: Poule.Tracklist.Search,
   timeout: null,
+  hideTimeout: null,
   interval: 200,
+
+  get keep() {
+    var keep = this._keep;
+    this._keep = false;
+    return keep;
+  },
+
+  set keep(v) {
+    this._keep = v;
+  },
+
+  get selected() {
+    var index = this.index;
+    return index === -1 ? null : this.results[index];
+  },
+
+  set selected(v) {
+    this.unselect();
+    v.selected = true;
+  },
+
+  get index() {
+    return this.results.findIndex(function(result) {
+      return result.selected;
+    });
+  },
+
+  set index(v) {
+    if(v < 0) v = this.results.length - 1;
+    this.selected = this.results[v%this.results.length];
+  },
 
   get value() {
     return this.elements.input.value.trim();
@@ -79,14 +114,19 @@ Poule.Tracklist.Search.prototype = {
     }
   },
 
+  unselect: function() {
+    var result = this.selected;
+    if(result) result.selected = false;
+  },
+
   fetch: function() {
     var self = this;
 
     clearTimeout(this.timeout);
-    self.loading = true;
+    this.loading = true;
     this.timeout = setTimeout(function() {
       self.api.search(self.value, function(tracks) {
-        self.tracks = tracks;
+        self.results = tracks.map(function(track) { return new self.constructor.Result(track); });
         self.render();
         self.loading = false;
       });
@@ -98,24 +138,56 @@ Poule.Tracklist.Search.prototype = {
   },
 
   render: function() {
-    var element, track;
+    var element, result;
 
     this.clear();
 
-    if(this.tracks.length == 0) this.empty = true;
+    if(this.results.length == 0) this.empty = true;
     else {
+      var self = this;
+      var result;
       this.empty = false;
+      this.selected = this.results[0];
 
-      for(var i = 0; i < this.tracks.length; i++) {
-        track = this.tracks[i];
-        track.element.className += ' track--small';
+      for(var i = 0; i < this.results.length; i++) {
+        result = this.results[i];
 
-        element = document.createElement('div');
-        element.className = 'tracklist__search-result';
-        element.appendChild(track.element);
+        result.on('mousedown', function() {
+          self.keep = true;
+        });
 
-        this.elements.results.appendChild(element);
+        result.on('click', function() {
+          self.selected = this;
+          self.validate();
+        });
+
+        this.elements.results.appendChild(this.results[i].element);
       }
+    }
+  },
+
+  handle: function() {
+    if(this.value === '') {
+      this.hidden = true;
+      this.loading = false;
+      this.results = [];
+      this.clear();
+    }
+    else {
+      this.hidden = false;
+      this.fetch();
+    }
+  },
+
+  validate: function() {
+    this.elements.input.blur();
+    this.focus = false;
+
+    var selected = this.selected;
+    if(selected) {
+      this.dispatch('validate', {track: selected.track});
+      this.value = '';
+      this.handle();
     }
   },
 
@@ -136,25 +208,29 @@ Poule.Tracklist.Search.prototype = {
 
     this.elements.input.addEventListener('blur', function() {
       if(self.value === '') self.focus = false;
-      self.hidden = true;
+      if(!self.keep) self.hidden = true;
     });
 
-    this.elements.input.addEventListener('keydown', function() {
-      self.oldValue = self.value;
-      setTimeout(function() {
-        if(self.oldValue !== self.value) {
-          if(self.value === '') {
-            self.hidden = true;
-            self.loading = false;
-            self.tracks = [];
-            self.clear();
-          }
-          else {
-            self.hidden = false;
-            self.fetch();
-          }
-        }
-      }, 1);
+    this.elements.input.addEventListener('keydown', function(event) {
+      if(event.keyCode === 38) {
+        self.index--;
+      }
+      else if(event.keyCode === 40) {
+        self.index++;
+      }
+      else if(event.keyCode === 13) self.validate();
+      else if(event.keyCode === 27) self.elements.input.blur();
+      else {
+        self.oldValue = self.value;
+
+        setTimeout(function() {
+          if(self.oldValue !== self.value) self.handle();
+        }, 1);
+
+        return;
+      }
+
+      event.preventDefault();
     });
   }
 };

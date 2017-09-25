@@ -58,10 +58,18 @@ Poule.Request.prototype = {
 
   send: function(data) {
     if(data !== undefined) this.data = data;
+    var method = this.method.toLowerCase();
+    if(!['get', 'post'].includes(method)) {
+      if(!this.data) this.data = {};
+      this.data._method = this.method;
+      method = 'post';
+    }
 
-    var url = this.url+(this.method.toLowerCase() === 'get' ? '?'+this.params : '');
-    this.xhr.open(this.method.toUpperCase(), url);
-    this.xhr.send(this.method.toLowerCase() === 'post' ? this.form : undefined);
+    var url = this.url+(method === 'get' ? '?'+this.params : '');
+    this.xhr.open(method, url);
+    this.xhr.send(method === 'post' ? this.form : undefined);
+
+    if(this.data) delete this.data._method;
 
     return this;
   }
