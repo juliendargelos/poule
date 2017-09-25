@@ -277,6 +277,8 @@ Poule.Tracklist.prototype = {
       for(var i = 0; i < this.tracks.length; i++) this.append(this.tracks[i]);
     }
 
+    if(this.tracks.length == 1) this.current = this.tracks[0];
+
     this.controls.playable = this.tracks.length > 0;
     this.controls.nextable = this.tracks.length > 1;
   },

@@ -65,7 +65,7 @@ Poule.Request.prototype = {
       method = 'post';
     }
 
-    var url = this.url+(method === 'get' ? '?'+this.params : '');
+    var url = this.url+(method === 'get' ? ('?'+this.params).replace(/^\?$/, '') : '');
     this.xhr.open(method, url);
     this.xhr.send(method === 'post' ? this.form : undefined);
 
