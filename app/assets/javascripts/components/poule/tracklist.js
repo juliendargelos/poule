@@ -7,6 +7,8 @@ Poule.Tracklist = function(element) {
   this.search = new this.constructor.Search(this.element.querySelector('.tracklist__search'));
   this.controls = new this.constructor.Controls(this.element.querySelector('.tracklist__controls'));
   this.progressBar = this.element.querySelector('.tracklist__progress-bar');
+  this._background = this.element.querySelector('.tracklist__background');
+  this.backgroundCue = this.element.querySelector('.tracklist__background-cue');
   this.tracks = [];
   this._current = null;
 
@@ -96,6 +98,21 @@ Poule.Tracklist.prototype = {
     return this.current && this.current.playing;
   },
 
+  get background() {
+    return this._background.style.backgroundImage.replace(/^url\((.+)\)$/, '$1');
+  },
+
+  set background(v) {
+    var self = this;
+
+    this.backgroundCue.style.backgroundImage = 'url('+v+')';
+    this.backgroundCue.className += ' tracklist__background-cue--visible';
+    setTimeout(function() {
+      self._background.style.backgroundImage = 'url('+v+')';
+      self.backgroundCue.className = self.backgroundCue.className.replace(/\btracklist__background-cue--visible\b/g, '');
+    }, 500);
+  },
+
   get current() {
     return this._current;
   },
@@ -120,6 +137,7 @@ Poule.Tracklist.prototype = {
         }
       }
 
+      this.background = v.cover;
       this.controls.playable = true;
       if(this.tracks.length < 2) this.controls.nextable = false;
     }

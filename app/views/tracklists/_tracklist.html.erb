@@ -1,5 +1,7 @@
 <div class="tracklist" data-slug="<%= @tracklist.slug %>"<%= ' data-master' if current_tracklist && current_tracklist.id == @tracklist.id %>>
-  <div class="tracklist__background"></div>
+  <div class="tracklist__background">
+    <div class="tracklist__background-cue"></div>
+  </div>
 
   <header class="tracklist__wrapper tracklist__current">
     <div class="tracklist__controls">

@@ -4,19 +4,29 @@
   max-width: 650px
   margin-top: 30px
 
-  &__background
-    // TODO: remove
-    background-image: image-url('tmpbg.png')
-
+  &__background, &__background-cue
+    background-color: $black
     background-repeat: no-repeat
     background-position: center center
     background-size: cover
+
+  &__background
     top: 0
     left: 0
     width: 100vw
     height: 100vh
+    transform: scale(1.2)
+    filter: blur(40px)
     position: fixed
     z-index: -1000
+
+  &__background-cue
+    width: 100%
+    height: 100%
+    opacity: 0
+    &--visible
+      opacity: 1
+      transition: .5s
 
   &__wrapper
     padding: 30px
