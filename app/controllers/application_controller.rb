@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
   def current_tracklist
     @current_tracklist ||= Tracklist.find_by uuid: session[:tracklist_uuid]
   end
+  helper_method :current_tracklist
 
   def current_tracklist= v
     current_tracklist.destroy if current_tracklist?

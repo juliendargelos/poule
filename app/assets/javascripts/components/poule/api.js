@@ -49,9 +49,15 @@ Poule.Api.prototype = {
     this.associate('apiReady', 'ready', this.constructor.all.length);
 
     this.providers = this.constructor.all.map(function(api) {
-      return new api(function() {
+      var api = new api(function() {
         self.dispatch('apiReady');
       });
+
+      api.on('progress', function(event) {
+        self.dispatch('progress', event);
+      });
+
+      return api;
     });
   },
 

@@ -23,6 +23,56 @@
     +max(medium)
       padding: 20px
 
+  &__controls
+    margin-top: 10px
+    margin-left: 10px
+    float: right
+    display: flex
+    align-items: space-between
+
+  &__control
+    background-repeat: no-repeat
+    background-position: center center
+    background-size: auto 100%
+    width: 25px
+    height: 25px
+    cursor: pointer
+    flex-shrink: 0
+    flex-grow: 0
+
+    &:last-of-type
+      background-position: right center
+
+    @each $type in previous, next, play, pause
+      &--#{$type}
+        background-image: image-url('#{$type}.svg')
+
+    &--disabled
+      opacity: .5
+      cursor: default
+
+    &--hidden
+      display: none
+
+  &__progress
+    background: transparentize($white, .7)
+    width: calc(100% - 230px)
+    margin-top: 30px
+    margin-left: 230px
+    height: 2px
+    border-radius: 2px
+    +max(medium)
+      width: calc(100% - 90px)
+      margin-top: 25px
+      margin-bottom: -10px
+      margin-left: 90px
+
+  &__progress-bar
+    background: $white
+    width: 0
+    height: 2px
+    border-radius: 2px
+
   &__search
     padding-top: 20px
     padding-bottom: 20px
@@ -119,14 +169,23 @@
   &__search-result
     padding: 15px
     cursor: pointer
+    &:first-of-type
+      border-top-right-radius: 15px
+      border-top-left-radius: 15px
+    &:last-of-type
+      border-bottom-right-radius: 15px
+      border-bottom-left-radius: 15px
     &:not(:last-of-type)
       border-bottom: 1px solid $thin-grey
+    &:hover
+      background-color: lighten($thin-grey, 3)
     &--selected, &:active
       background-color: $thin-grey
 
   &__content
     background: $white
-    border-radius: 20px
+    border-top-left-radius: 20px
+    border-top-right-radius: 20px
     box-shadow: $tracklist-box-shadow
     +max(medium)
       border-bottom-left-radius: 0
@@ -138,12 +197,78 @@
     display: flex
     justify-content: space-between
     flex-wrap: wrap
+    +max(medium)
+      min-height: calc(100vh - 243px)
+      display: block
 
   &__track
     width: calc(50% - 15px)
     margin-top: 30px
+    cursor: default
+    display: flex
     flex-grow: 0
     flex-shrink: 0
+    justify-content: space-between
+    align-items: center
     +max(medium)
       width: 100%
       margin-top: 20px
+
+  &__track-remove
+    background: lighten($light-grey, 4) image-url('cross.svg') no-repeat center center / 40% auto
+    width: 20px
+    height: 20px
+    margin-left: 10px
+    border-radius: 20px
+    cursor: pointer
+    display: block
+    flex-shrink: 0
+    flex-grow: 0
+    transition: .2s
+    &:hover
+      background-color: $light-grey
+
+  &:not([data-master]) &__controls
+    display: none
+
+  &:not([data-master]) &__progress
+    display: none
+
+  &__footer
+    background: $white
+    margin-top: auto
+    border-top: 1px solid $thin-grey
+    border-bottom-left-radius: 20px
+    border-bottom-right-radius: 20px
+    +max(medium)
+      border-bottom-left-radius: 0
+      border-bottom-right-radius: 0
+
+  &__link
+    display: flex
+    align-items: center
+
+  &__link-label, &__link-input
+    margin: 0
+    padding: 20px
+    display: flex
+    color: $grey
+
+  &__link-label
+    padding-right: 0
+    flex-shrink: 0
+    font-size: 9px
+    text-transform: uppercase
+    letter-spacing: .15em
+
+  &__link-input
+    background: transparent
+    border: none
+    border-radius: 0
+    padding-top: 19px
+    padding-bottom: 21px
+    flex-grow: 1
+    outline: none
+    appearance: none
+    font-family: $sans-serif
+    font-size: 13px

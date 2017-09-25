@@ -1,4 +1,8 @@
 Poule.Track = function(api, identifier, cover, title, meta, id) {
+  Poule.Event.Listener.defer(this);
+
+  var self = this;
+
   this._element = null;
   this.elements = {};
 
@@ -8,6 +12,11 @@ Poule.Track = function(api, identifier, cover, title, meta, id) {
   this.cover = cover;
   this.title = title;
   this.meta = meta;
+  this.playing = false;
+
+  this.api.on('end', function() {
+    self.dispatch('end');
+  });
 };
 
 Poule.Track.prototype = {
@@ -135,5 +144,30 @@ Poule.Track.prototype = {
 
   remove: function() {
     if(this.created && this.element.parentNode) this.element.parentNode.removeChild(this.element);
+  },
+
+  removeParent: function() {
+    if(this.created && this.element.parentNode && this.element.parentNode.parentNode) this.element.parentNode.parentNode.removeChild(this.element.parentNode);
+  },
+
+  replace: function(track) {
+    if(this.created && this.element.parentNode) {
+      this.element.parentNode.insertBefore(track.element, this.element);
+      this.remove();
+    }
+  },
+
+  play: function() {
+    if(!this.playing) {
+      this.api.play(this);
+      this.playing = true;
+    }
+  },
+
+  pause: function() {
+    if(this.playing) {
+      this.api.pause();
+      this.playing = false;
+    }
   }
 };

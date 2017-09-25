@@ -51,6 +51,15 @@
     font-size: 9px
     color: transparentize($grey, .3)
 
+  &__title, &__meta
+    word-break: break-all
+
+  &--big &__title, &--big &__meta
+    text-overflow: ellipsis
+    white-space: nowrap
+    word-break: none
+    overflow: hidden
+
   &--big
     display: block
 

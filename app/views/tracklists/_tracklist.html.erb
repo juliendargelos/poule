@@ -1,9 +1,19 @@
-<div class="tracklist" data-slug="<%= @tracklist.slug %>">
+<div class="tracklist" data-slug="<%= @tracklist.slug %>"<%= ' data-master' if current_tracklist && current_tracklist.id == @tracklist.id %>>
   <div class="tracklist__background"></div>
 
   <header class="tracklist__wrapper tracklist__current">
+    <div class="tracklist__controls">
+      <div class="tracklist__control tracklist__control--play tracklist__control--disabled"></div>
+      <div class="tracklist__control tracklist__control--pause tracklist__control--disabled tracklist__control--hidden"></div>
+      <div class="tracklist__control tracklist__control--next tracklist__control--disabled"></div>
+    </div>
+
     <%= render 'tracks/track', big: true %>
-  </header>
+
+    <div class="tracklist__progress">
+      <div class="tracklist__progress-bar"></div>
+    </div>
+</header>
 
   <main class="tracklist__content">
     <div class="tracklist__wrapper">
@@ -21,7 +31,7 @@
   <footer class="tracklist__footer">
     <span class="tracklist__link">
       <label class="tracklist__link-label">Link</label>
-      <input class="tracklist__link-input"/>
+      <input class="tracklist__link-input" value="<%= tracklist_url slug: @tracklist.slug %>" readonly onclick="this.select();"/>
     </span>
   </footer>
 </div>

@@ -1,5 +1,17 @@
 Poule.Api.Youtube = function() {
+  var self = this;
+
   Poule.Api.apply(this, Array.prototype.slice.call(arguments));
+  this.oldTime = 0;
+
+  setInterval(function() {
+    var time = self.time;
+    if(self.oldTime !== time) {
+      self.oldTime = time;
+      self.dispatch('progress', {progress: self.progress});
+      if(self.progress >= 1) self.dispatch('end');
+    }
+  }, 100);
 };
 
 Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPropertyDescriptors({
@@ -17,6 +29,18 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPr
   ],
   key: 'AIzaSyCHv6fX1q3b0y74K-ljqzXHtbjx2j8rjIs',
 
+  get duration() {
+    return this.player && this.player.getDuration ? this.player.getDuration() : 0;
+  },
+
+  get time() {
+    return this.player && this.player.getCurrentTime ? this.player.getCurrentTime() : 0;
+  },
+
+  get progress() {
+    return this.duration == 0 ? 0 : this.time/this.duration;
+  },
+
   init: function() {
     var self = this;
 
@@ -26,6 +50,10 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPr
     document.body.appendChild(this.container);
 
     this.player = new YT.Player(this.container.id);
+
+    this.player.addEventListener('stateChange', function(event) {
+      self.dispatch('stateChange', {state: event.data});
+    });
 
     gapi.load('client', function() {
       gapi.client.load('youtube', 'v3', function() {
@@ -37,8 +65,19 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPr
 
   play: function(track) {
     this.require('ready', function() {
-      if(track instanceof Poule.Track) this.player.loadVideoById(track.id);
-      this.player.playVideo();
+      if(track && this.player.getVideoData().video_id != track.identifier) {
+        var self = this;
+        this.player.loadVideoById(track.identifier);
+        this.player.seekTo(0);
+
+        setTimeout(function() {
+          self.player.pauseVideo();
+          setTimeout(function() {
+            self.player.playVideo();
+          }, 1);
+        } ,1);
+      }
+      else this.player.playVideo();
     });
   },
 
@@ -57,7 +96,7 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPr
         maxResults: 1
       }).execute(function(response) {
         if(response.result && response.result.items && response.result.items.length > 0) {
-          callback(new Poule.Track(source, url, cover, title, meta));
+          callback(new Poule.Track(self, url, cover, title, meta));
         }
         else callback(null);
       });
