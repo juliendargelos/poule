@@ -5,9 +5,9 @@ Poule.Tracklist.Controls = function(element) {
 
   this.element = element;
   this.elements = {
-    pause: this.element.querySelector('.tracklist__control--pause'),
-    play: this.element.querySelector('.tracklist__control--play'),
-    next: this.element.querySelector('.tracklist__control--next'),
+    pause: this.element.querySelector('.tracklist__control--pause') || document.createElement('div'),
+    play: this.element.querySelector('.tracklist__control--play') || document.createElement('div'),
+    next: this.element.querySelector('.tracklist__control--next') || document.createElement('div')
   };
 
   this.elements.next.addEventListener('click', function() {
