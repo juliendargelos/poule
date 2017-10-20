@@ -65,7 +65,7 @@ Poule.Api.Youtube.prototype = Object.create(Poule.Api.prototype, Object.getOwnPr
 
   play: function(track) {
     this.require('ready', function() {
-      if(track && this.player && this.player.getVideoData().video_id != track.identifier) {
+      if(track && this.player.getVideoData() && this.player.getVideoData().video_id != track.identifier) {
         var self = this;
         this.player.loadVideoById(track.identifier);
         this.player.seekTo(0);
