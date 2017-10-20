@@ -41,6 +41,7 @@ Poule.Tracklist = function(element) {
   this.requests.add.on('success', function(event) {
     var tracks = self.parse(event.response);
     self.render(tracks);
+    if(!self.current) self.current = self.tracks[0];
   });
 
   this.search.on('validate', function(event) {
@@ -142,11 +143,11 @@ Poule.Tracklist.prototype = {
 
       v.big = true;
       v.removeParent();
+      console.log('remove parent bro');
 
       if(this.current) {
         this.current.replace(v);
-        if(v.id !== this.current) this.current.pause();
-        this.remove(this.current, true);
+        this.current.pause();
       }
       else {
         var current = this.elements.current.querySelector('.track');
@@ -201,11 +202,12 @@ Poule.Tracklist.prototype = {
   },
 
   add: function(track) {
+    var self = this;
     this.requests.add.send(track.data);
   },
 
-  remove: function(track, keepNode) {
-    if(this.delete(track, keepNode)) this.requests.remove.send(track.data);
+  remove: function(track) {
+    if(this.delete(track)) this.requests.remove.send(track.data);
   },
 
   different: function(tracks) {
@@ -239,11 +241,11 @@ Poule.Tracklist.prototype = {
     this.elements.tracks.appendChild(element);
   },
 
-  delete: function(track, keepNode) {
+  delete: function(track) {
     var index = this.tracks.indexOf(track);
     if(index !== -1) {
       this.tracks = this.tracks.slice(0, index).concat(this.tracks.slice(index + 1));
-      if(!keepNode) track.removeParent();
+      track.removeParent();
       return true;
     }
     else return false;
@@ -276,8 +278,6 @@ Poule.Tracklist.prototype = {
       this.clear();
       for(var i = 0; i < this.tracks.length; i++) this.append(this.tracks[i]);
     }
-
-    if(this.tracks.length == 1) this.current = this.tracks[0];
 
     this.controls.playable = this.tracks.length > 0;
     this.controls.nextable = this.tracks.length > 1;
