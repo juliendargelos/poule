@@ -137,6 +137,8 @@ Poule.Tracklist.prototype = {
   },
 
   set current(v) {
+    if(typeof v === 'object' && v !== null && this.current && v.id === this.current) return;
+
     if(v) {
       var self = this;
 
