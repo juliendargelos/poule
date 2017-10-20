@@ -137,8 +137,6 @@ Poule.Tracklist.prototype = {
   },
 
   set current(v) {
-    if(typeof v === 'object' && v !== null && this.current && v.id === this.current) return;
-
     if(v) {
       var self = this;
 
@@ -147,7 +145,7 @@ Poule.Tracklist.prototype = {
 
       if(this.current) {
         this.current.replace(v);
-        this.current.pause();
+        if(v.id !== this.current) this.current.pause();
         this.remove(this.current);
       }
       else {
