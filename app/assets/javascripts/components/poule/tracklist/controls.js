@@ -69,8 +69,8 @@ Poule.Tracklist.Controls.prototype = {
         this.elements.pause.className = this.elements.pause.className.replace(/\btracklist__control--disabled\b/, '');
       }
       else {
-        this.elements.className.play += ' tracklist__control--disabled';
-        this.elements.className.pause += ' tracklist__control--disabled';
+        this.elements.play.className += ' tracklist__control--disabled';
+        this.elements.pause.className += ' tracklist__control--disabled';
       }
     }
   },
