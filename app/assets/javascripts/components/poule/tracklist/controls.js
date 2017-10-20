@@ -5,9 +5,9 @@ Poule.Tracklist.Controls = function(element) {
 
   this.element = element;
   this.elements = {
-    pause: this.element.querySelector('.tracklist__control--pause') || document.createElement('div'),
-    play: this.element.querySelector('.tracklist__control--play') || document.createElement('div'),
-    next: this.element.querySelector('.tracklist__control--next') || document.createElement('div')
+    pause: this.element.querySelector('.tracklist__control--pause'),
+    play: this.element.querySelector('.tracklist__control--play'),
+    next: this.element.querySelector('.tracklist__control--next')
   };
 
   this.elements.next.addEventListener('click', function() {
@@ -69,14 +69,13 @@ Poule.Tracklist.Controls.prototype = {
         this.elements.pause.className = this.elements.pause.className.replace(/\btracklist__control--disabled\b/, '');
       }
       else {
-        this.elements.play += ' tracklist__control--disabled';
-        this.elements.pause += ' tracklist__control--disabled';
+        this.elements.className.play += ' tracklist__control--disabled';
+        this.elements.className.pause += ' tracklist__control--disabled';
       }
     }
   },
 
-  play: function() {
-    if(!this.playing && this.playable) {
+  play: function() {& this.playable) {
       this.playing = true;
       return true;
     }
