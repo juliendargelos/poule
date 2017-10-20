@@ -146,7 +146,7 @@ Poule.Tracklist.prototype = {
       if(this.current) {
         this.current.replace(v);
         if(v.id !== this.current) this.current.pause();
-        this.remove(this.current);
+        this.remove(this.current, true);
       }
       else {
         var current = this.elements.current.querySelector('.track');
@@ -204,8 +204,8 @@ Poule.Tracklist.prototype = {
     this.requests.add.send(track.data);
   },
 
-  remove: function(track) {
-    if(this.delete(track)) this.requests.remove.send(track.data);
+  remove: function(track, keepNode) {
+    if(this.delete(track, keepNode)) this.requests.remove.send(track.data);
   },
 
   different: function(tracks) {
@@ -239,11 +239,11 @@ Poule.Tracklist.prototype = {
     this.elements.tracks.appendChild(element);
   },
 
-  delete: function(track) {
+  delete: function(track, keepNode) {
     var index = this.tracks.indexOf(track);
     if(index !== -1) {
       this.tracks = this.tracks.slice(0, index).concat(this.tracks.slice(index + 1));
-      if(!this.current || track.id !== this.current.id) track.removeParent();
+      if(!keepNode) track.removeParent();
       return true;
     }
     else return false;
