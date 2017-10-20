@@ -243,7 +243,7 @@ Poule.Tracklist.prototype = {
     var index = this.tracks.indexOf(track);
     if(index !== -1) {
       this.tracks = this.tracks.slice(0, index).concat(this.tracks.slice(index + 1));
-      track.removeParent();
+      if(!this.current || track.id !== this.current.id) track.removeParent();
       return true;
     }
     else return false;
