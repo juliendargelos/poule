@@ -138,7 +138,10 @@ Poule.Tracklist.prototype = {
   },
 
   set current(v) {
-    if(v && this.current && this.current.identifier == v.identifier) return;
+    if(v && this.current && this.current.identifier == v.identifier) {
+      v.removeParent();
+      return;
+    }
 
     if(v) {
       var self = this;
