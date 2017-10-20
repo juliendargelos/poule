@@ -75,7 +75,8 @@ Poule.Tracklist.Controls.prototype = {
     }
   },
 
-  play: function() {& this.playable) {
+  play: function() {
+    if(!this.playing && this.playable) {
       this.playing = true;
       return true;
     }
